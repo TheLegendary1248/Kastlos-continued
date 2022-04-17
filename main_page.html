@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <head>
-<link rel="stylesheet" href="main_style.css"></head>
-<script src="app.js"></script>
+    <link rel="stylesheet" href="main_style.css"></head>
+    <script src="app.js"></script> <!--The main script-->
+    <script src="input.js"></script> <!--Simple script that handles reading keyboard input every game loop frame-->
+    <script src="collision.js"></script> <!--The melting pot of future-spaghetti code-->
 </head>
 <body>
-    <!---->
+    <!--Main fits the whole screen-->
     <div id="main">
+        <!--Consider center to sort of the world, as objects will be appended to it, and as it is positioned to the center of the screen-->
         <div id="center">
-            
+            <svg class="object" height="10" width="10">
+                <polygon points="0,0 10,0 10,10 0,10" style="fill:lime;stroke:purple;stroke-width:1" />
+            </svg>
         </div>
     </div>
-    <svg class="object" height="250" width="500">
-        <polygon points="0,0 10,0 10,10 0,10" style="fill:lime;stroke:purple;stroke-width:1" />
-      </svg>
+    
 </body>
