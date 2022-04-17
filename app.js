@@ -12,8 +12,8 @@ function gameLoop()
 {
     frameCounter += 1
 
-    player.posx += input.horizontal
-    player.posy += input.vertical
+    player.posx += input.horizontal * 5
+    player.posy += input.vertical * 5
     player.style.left = player.posx + "px"
     player.style.top = -player.posy + "px" 
     //console.log(`Frame : ${frameCounter}, ${player.posx}, ${input.vertical}`)
