@@ -26,9 +26,13 @@ const input =
         {
             this.downKeys.splice(m, 1)
         }
+        if(event.keyCode == 37 ) this.horizontal = 0 //Left
+        else if(event.keyCode == 38) this.vertical = 0 //Up
+        else if(event.keyCode == 39) this.horizontal = 0 //Right
+        else if(event.keyCode == 40) this.vertical = 0 //Down
     }
     
 }
 document.addEventListener("keydown", (e) => input.getKeyDown(e))
 
-document.addEventListener("keyup", () => input.getKeyUp)
+document.addEventListener("keyup", (e) => input.getKeyUp(e))
