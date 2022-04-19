@@ -7,6 +7,10 @@ Im going to try my hand sweep and prune, or whatever that quite means
 //--Vector 2 Data Object--//
 class Vec2 
 {
+    /**
+     * @param {Number} x 
+     * @param {Number} y 
+     */
     constructor(x,y)
     {
         this.x = x;
@@ -59,9 +63,14 @@ class AlignedBox extends ColliderShape
     {
         if(aabb)
         {
-            aabb.x = min.x + pos.x   
+            aabb.min = Vec2.add(this.min, pos)
+            aabb.max = Vec2.add(this.max, pos)
         }
-        return new AABB()
+        else
+        {
+            aabb = new AABB(new Vec2())
+        }
+        return aabb;
     }
 }
 class Circle extends ColliderShape
@@ -126,17 +135,14 @@ const Collision =
     */
     runDetection() //Runs the collision detection
     {   
-        console.log(this.objects.length)
         //Check every object in our array. Minus 1 in length for the fact that we're only checking for collision forwards in the array
         for (let index = 0; index < this.objects.length - 1; index++) 
         {
             const objectA = this.objects[index];
-            console.log(`Index ${index}, position at ${objectA.pos.x}, ${objectA.pos.y}`)
             if(objectA.enabled) //If the collider is enabled for detection
             {
                 let ahead = index + 1;
                 let objectB = this.objects[ahead];
-                console.log(`Checking index ${ahead}`)
                 //Check for collision with every object ahead of this one in the array via AABB
                 while(objectA.AABB.max.x > objectB.AABB.min.x)
                 {
@@ -158,11 +164,32 @@ const Collision =
             }
 
             //Respond to shape change requests
-
-            //Check if min.x is less than the object before this one in index.
-                //If the start of the array is reached, or the object before is NOT less x-wise, insert
+            objectA.AABB = objectA.shape.GetAABB(objectA.pos, objectA.AABB) //Update AABB
+            objectA.internalPos = objectA.pos; //Move collider
+            //Change position in array if necessary
+            let newIndex = index - 1
+            while(newIndex > -1) //If the start of the array is reached, or the object before is NOT less x-wise, insert
+            {
+                let prevObject = this.objects[newIndex]
+                if(prevObject.AABB.min.x > objectA.AABB.min.x) newIndex--//Check if min.x is less than our object 
+                else break
+            }
+            newIndex++;
+            if(newIndex != index) arraymove(this.objects, index, newIndex); //If there's no change in order, avoid the uneccesary work of moving the element  
         }
-             
+        //Leftover work for the last object
+        let last = this.objects[this.objects.length - 1]
+        last.AABB = last.shape.GetAABB(last.pos, last.AABB)
+        last.internalPos = last.pos
+        let newIndex = this.objects.length - 2
+        while(newIndex > -1) //If the start of the array is reached, or the object before is NOT less x-wise, insert
+        {
+            let prevObject = this.objects[newIndex]
+            if(prevObject.AABB.min.x > last.AABB.min.x) newIndex--//Check if min.x is less than our object 
+            else break
+        }
+        newIndex++;
+        if(newIndex != this.objects.length - 1) arraymove(this.objects, this.objects.length - 1, newIndex) //If there's no change in order, avoid the uneccesary work of moving the element
     },
     /**
      * TO BE USED BY COLLIDER ONLY
@@ -189,4 +216,17 @@ const Collision =
     {
         this.objects.splice(obj.index, 1);
     }
+}
+//https://stackoverflow.com/questions/5306680/move-an-array-element-from-one-array-position-to-another Move an array element from one index to another
+//I mean, i would've come up with this, but i was wondering if js was "feature-rich" enough to have a function with native code to deal with this
+/**
+ * Moves an element in an array from one index to another
+ * @param {Array} arr 
+ * @param {Number} fromIndex 
+ * @param {Number} toIndex 
+ */
+function arraymove(arr, fromIndex, toIndex) {
+    var element = arr[fromIndex];
+    arr.splice(fromIndex, 1);
+    arr.splice(toIndex, 0, element);
 }

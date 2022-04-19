@@ -7,7 +7,7 @@ function onLoad(){
     player = document.querySelector(".object")
     player.collider = new Collider(new AlignedBox(new Vec2(-10,-10), new Vec2(10,10)), new Vec2(0,0))
     let empty = new Collider(new AlignedBox(new Vec2(50,50), new Vec2(100,100)), new Vec2(0,0)) 
-    setInterval(gameLoop,160)
+    setInterval(gameLoop,16)
 }
 function gameLoop()
 {
