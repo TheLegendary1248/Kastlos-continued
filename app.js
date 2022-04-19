@@ -12,7 +12,7 @@ function onLoad(){
 function gameLoop()
 {
     frameCounter += 1
-    player.x.
+
     player.collider.pos.x += input.horizontal * 5
     player.collider.pos.y += input.vertical * 5
     player.style.left = player.collider.pos.x + "px"
