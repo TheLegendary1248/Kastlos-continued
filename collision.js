@@ -32,15 +32,36 @@ class AABB //Axis Aligned Bounding Box, a box whose orientation is aligned with 
 }
 //---COLLIDER SHAPE DEFINITIONS---//
 class ColliderShape 
-{   }
+{  
+    /**
+     * @param {Vec2} pos The position of the shape in world space
+     * @param {AABB} aabb The AABB to be modified incase allocation is to be avoided
+     * @returns {AABB} Returns the given AABB, now modified. If one wasn't provided, a new one is made
+     */
+   GetAABB(pos, aabb) {return null;} 
+}   
 class AlignedBox extends ColliderShape
 {
+    /**
+     * 
+     * @param {Vec2} min The minimum point of the box.
+     * @param {Vec2} max The maximum point of the box.
+     */
     constructor(min, max)
     {
         super();
+        if(min.x > max.x | min.y > max.y) throw "Attempted to create an AlignedBox shape with invalid points"
         this.min = min;
         this.max = max;
         this.type = "AABB";
+    }
+    GetAABB(pos, aabb)
+    {
+        if(aabb)
+        {
+            aabb.x = min.x + pos.x   
+        }
+        return new AABB()
     }
 }
 class Circle extends ColliderShape
@@ -57,17 +78,16 @@ class Collider
 {
     //https://stackoverflow.com/questions/8407622/set-type-for-function-parameters. Thanks to this keeping track of the expected type of my params
     /**
-    * @param {ColliderShape}  shape
-    * @param {Vec2} pos
+    * @param {ColliderShape} shape The shape our collider takes on
+    * @param {Vec2} pos The position of the collider
+    * @param {Boolean} enabled Should the collider start enabled
     */
-    constructor(shape, pos) 
+    constructor(shape, pos, enabled) 
     {
-
-        console.log(shape)
         if(shape.type == "AABB") //Box
         {
             this.AABB = new AABB(
-                Vec2.sub(pos, shape.min),
+                Vec2.add(pos, shape.min),
                 Vec2.add(pos, shape.max)
             )
             
@@ -79,14 +99,18 @@ class Collider
                 Vec2.add(pos, new Vec2(shape.radius, shape.radius))
             )
         }
+        this.shape = shape;
         this.internalPos = pos; //Consider this the "before" position. This is the position that will be used for checking collision on a frame 
         this.pos = pos; //Consider this the "after" position. This one can be changed via code and the internal position will be moved to this after collision was checked. This is to ensure that the objects are accurately sorted by position
-        console.log(this)
-        this.index = Collision.addNewPhysicsObject(this) //Stores the index of the object in that array down there, for when we take an object out of the system
+        this.enabled = enabled || true //I read the docs, fool! Yes I comprehend how this works(ableit with some dif because it's new) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators
+        //Basically, for the line above, incase enabled isn't a boolean, it's set to true by default
+        this.index = Collision.addObject(this) //Stores the index of the object in that array down there, for when we take an object out of the system
+        this.onCollision = null //Callback function
+    
     }
     destructor() //Yes, i know this is not part of javascript, so i'll call it manually
     {
-        
+        Collision.removeObject()
     }
 
     
@@ -94,47 +118,57 @@ class Collider
 //---COLLISION DETECTION OBJECT---//
 const Collision = 
 {
-    objects: [], //Reference to all collision objects
+    objects: [], //Reference to all collider objects
     /*
     Keep this array sorted by the x-position of all objects(preferably x since most screens are more wide than long)
     This way, we can just check for collision with all objects ahead in index, which prevents checking collision between objects twice
     And if something moves along the x-axis, we just need to check if the object's AABB min.x is less than the one before it
     */
     runDetection() //Runs the collision detection
-    {
-        //Check each object of our array
+    {   
         console.log(this.objects.length)
-        for (let index = 0; index < this.objects.length; index++) 
+        //Check every object in our array. Minus 1 in length for the fact that we're only checking for collision forwards in the array
+        for (let index = 0; index < this.objects.length - 1; index++) 
         {
             const objectA = this.objects[index];
             console.log(`Index ${index}, position at ${objectA.pos.x}, ${objectA.pos.y}`)
-            continue;
-            
-            let ahead = index + 1;
-            let objectB = objects[ahead];
-            colliderA = objectA.collider; //We're gonna be referencing these alot, so ya know, reference them now
-            colliderB = objectB.collider;
-            //Check for collision with every object ahead of this one in the array via AABB
-            while(colliderA.AABB.max.x > objectB.collider.AABB.min.x)
+            if(objectA.enabled) //If the collider is enabled for detection
             {
-                //Check if we want them to collide
-                //...
-                //Check AABB overlap (and consider the fact that our AABB.min.x is already less than what is being checked against, along with the condition above)
-                if(colliderA.AABB.max.y > colliderB.AABB.min.y & colliderB.AABB.max.y > colliderA.AABB.min.y)
+                let ahead = index + 1;
+                let objectB = this.objects[ahead];
+                console.log(`Checking index ${ahead}`)
+                //Check for collision with every object ahead of this one in the array via AABB
+                while(objectA.AABB.max.x > objectB.AABB.min.x)
                 {
-                    console.log("COLLISIONNNNNNNN")
-                    //More in depth collision test
+                    
+                    //Check if we want them to collide
+                    //...
+                    //Check AABB overlap (and consider the fact that our AABB.min.x is already less than what is being checked against, along with the condition above)
+                    if(objectA.AABB.max.y > objectB.AABB.min.y & objectB.AABB.max.y > objectA.AABB.min.y)
+                    {
+                        console.log(objectA.AABB)
+                        console.log(objectB.AABB)
+                        console.log("COLLISIONNNNNNNN")
+                        //More in depth collision test
+                    }
+                    ahead++;
+                    if(ahead >= this.objects.length) { break }
+                    objectB = this.objects[ahead];
                 }
-                ahead++;
             }
-            
+
             //Respond to shape change requests
+
             //Check if min.x is less than the object before this one in index.
                 //If the start of the array is reached, or the object before is NOT less x-wise, insert
         }
              
     },
-    addNewPhysicsObject(obj) //Basically an binary search to where to put the new object
+    /**
+     * TO BE USED BY COLLIDER ONLY
+     * @param {Collider} obj The collider to be added 
+     */
+    addObject(obj) //Basically an binary search to where to put the new object
     {
         console.log("Added new object")
         console.log(obj)
@@ -143,8 +177,16 @@ const Collision =
             if(this.objects.length == 0) { this.objects.push(obj) } //Don't waste time on an empty array
             else
             {
-
+                this.objects.push(obj)
             }
         }
+    } ,
+    /**
+     * TO BE USED BY COLLIDER ONLY
+     * @param {Collider} obj The collider to be removed 
+     */
+    removeObject(obj) //
+    {
+        this.objects.splice(obj.index, 1);
     }
 }

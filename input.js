@@ -9,7 +9,6 @@ const input =
     vertical: 0, //Set to left/right
     getKeyDown(event)
     {
-        console.log("Got key")
         if(!this.downKeys.includes(event.keyCode))
         { 
             this.downKeys.push(event.keyCode)
