@@ -4,20 +4,20 @@ var player;
 var world; //This is that "Center" object
 function onLoad(){
     player = document.querySelector(".object")
-    player.posx = 0
-    player.posy = 0
+    player.collider = new Collider(new AlignedBox(new Vec2(10,10), new Vec2(20,20)), new Vec2(0,0))
     setInterval(gameLoop,16)
 }
 function gameLoop()
 {
     frameCounter += 1
 
-    player.posx += input.horizontal * 5
-    player.posy += input.vertical * 5
-    player.style.left = player.posx + "px"
-    player.style.top = -player.posy + "px" 
+    player.collider.pos.x += input.horizontal * 5
+    player.collider.pos.y += input.vertical * 5
+    player.style.left = player.collider.pos.x + "px"
+    player.style.top = -player.collider.pos.y + "px" 
     //console.log(`Frame : ${frameCounter}, ${player.posx}, ${input.vertical}`)
     frameCounter +=1
     //player.style.top = frameCounter + "px";
+    Collision.runDetection()
     
 }
