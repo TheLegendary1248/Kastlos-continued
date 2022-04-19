@@ -12,17 +12,18 @@ class Vec2
         this.x = x;
         this.y = y;
     }
-    add(a, b)
+    static add(a, b)
     { return new Vec2(a.x + b.x, a.y + b.y) }
     addSelf(a)
     { this.x += a.x; this.y += a.y}
-    sub(a, b)
+    static sub(a, b)
     { return new Vec2(a.x - b.x, a.y - b.y) }
     subSelf(a)
     { this.x -= a.x; this.y -= a.y }
 }
 class AABB //Axis Aligned Bounding Box, a box whose orientation is aligned with the axis of the world space, yes i know what it is
 {
+    /** @param {Vec2} min The lower left point @param {Vec2} max The higher right point */
     constructor(min, max)
     {
         this.min = min
@@ -54,6 +55,11 @@ class Circle extends ColliderShape
 //---COLLIDER---//
 class Collider
 {
+    //https://stackoverflow.com/questions/8407622/set-type-for-function-parameters. Thanks to this keeping track of the expected type of my params
+    /**
+    * @param {ColliderShape}  shape
+    * @param {Vec2} pos
+    */
     constructor(shape, pos) 
     {
 
@@ -75,12 +81,12 @@ class Collider
         }
         this.internalPos = pos; //Consider this the "before" position. This is the position that will be used for checking collision on a frame 
         this.pos = pos; //Consider this the "after" position. This one can be changed via code and the internal position will be moved to this after collision was checked. This is to ensure that the objects are accurately sorted by position
-        
+        console.log(this)
         this.index = Collision.addNewPhysicsObject(this) //Stores the index of the object in that array down there, for when we take an object out of the system
     }
     destructor() //Yes, i know this is not part of javascript, so i'll call it manually
     {
-        Collision
+        
     }
 
     
@@ -101,8 +107,7 @@ const Collision =
         for (let index = 0; index < this.objects.length; index++) 
         {
             const objectA = this.objects[index];
-            console.log("Are we here")
-            console.log(`Index ${index}, position at ${objectA.internalPos}`)
+            console.log(`Index ${index}, position at ${objectA.pos.x}, ${objectA.pos.y}`)
             continue;
             
             let ahead = index + 1;
@@ -132,8 +137,8 @@ const Collision =
     addNewPhysicsObject(obj) //Basically an binary search to where to put the new object
     {
         console.log("Added new object")
-        console.log(obj.collider)
-        if(obj.collider instanceof Collider) //Make sure the object has a collider, of type collider
+        console.log(obj)
+        if(obj instanceof Collider) //Make sure the object has a collider, of type collider
         {
             if(this.objects.length == 0) { this.objects.push(obj) } //Don't waste time on an empty array
             else
