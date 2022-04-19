@@ -146,15 +146,24 @@ const Collision =
                 //Check for collision with every object ahead of this one in the array via AABB
                 while(objectA.AABB.max.x > objectB.AABB.min.x)
                 {
-                    
+                    if(objectB.enabled)
                     //Check if we want them to collide
                     //...
                     //Check AABB overlap (and consider the fact that our AABB.min.x is already less than what is being checked against, along with the condition above)
                     if(objectA.AABB.max.y > objectB.AABB.min.y & objectB.AABB.max.y > objectA.AABB.min.y)
                     {
-                        console.log(objectA.AABB)
-                        console.log(objectB.AABB)
-                        console.log("COLLISIONNNNNNNN")
+                        if(objectA.shape.type == "AABB" & objectB.shape.type == "AABB") //Box on Box (aka nothing todo cuz we just checked that)
+                        {
+
+                        }
+                        else if(objectA.shape.type == "Circle" & objectA.shape.type == "Circle") //Circle on Circle (the simplest)
+                        {
+
+                        }
+                        else //Circle on Box(oh no)
+                        {
+                            
+                        }
                         //More in depth collision test
                     }
                     ahead++;
