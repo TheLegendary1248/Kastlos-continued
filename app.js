@@ -13,14 +13,15 @@ function onLoad(){
     player.yVel = 0;
     
     let deadlyObj = document.createElement("div")
-    deadlyObj.classList.add("deadlyBox")
+    deadlyObj.classList.add("object")
+    deadlyObj.classList.add("popIn")
     let prompt = window.prompt("Enter box spawn count. Defaults to 2000 if NaN")
     prompt = parseInt(prompt)
-    let circle = true
+    let circle = false
     if(!circle) player.collider = new Collider(new AlignedBox(new Vec2(-2, -2), new Vec2(2, 2)), new Vec2(0,0))
     else player.collider = new Collider(new Circle(2), new Vec2(0,0))
     player.collider.onCollision = () => {label.textContent = "Colliding!"; label.style.backgroundColor = "#00ff00aa" }
-    for (let i = 0; i < (prompt || 2000); i++) {
+    for (let i = 0; i < (prompt || 150); i++) {
         let clone = deadlyObj.cloneNode()
         if(circle)
         {
@@ -36,7 +37,7 @@ function onLoad(){
         else
         {
             let min = new Vec2(Random(-800,800), Random(-370,350)) //Create a min
-            let max = new Vec2(Random(4,20) + min.x, Random(4,20) + min.y)
+            let max = new Vec2(Random(20,80) + min.x, Random(20,80) + min.y)
             clone.style.top = -max.y + "px"
             clone.style.left = min.x + "px"
             clone.style.height = (max.y - min.y) + "px" //y-coords in html just had to be wierd and stupid

@@ -1,9 +1,9 @@
 html, body {overflow:hidden; height: 100%;} /*Hides scrollbar, by not allowing it(not sure what i exactly mean by this)*/
 body 
 { 
-    background: #222; 
+    background: rgb(91, 119, 134); 
     height: 100%;
-    margin: 0px; 
+    margin: auto; 
     padding: 0px;
 }
 #border
@@ -13,9 +13,35 @@ body
     width: 1000px;
     left: -500px;
     top: -500px;
-    outline: 10px dashed red, 20px dashed yellow;
-    border-spacing: 10px;
+    outline: 10px dotted red;
     border-radius: 100%;
+    border: 10px dashed blue;
+}
+#title
+{
+    display: none;
+    transition: padding 0.4s;
+    color: white;
+    position: absolute;
+    font-family: 'Josefin Sans';
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 150px;
+    font-style: italic;
+
+    text-align: center;
+    padding: 60px 60px;
+
+    text-shadow: 10px 10px 0px black;
+    border: 20px groove black;
+    outline: 20px double black;
+    outline-offset: 0px;
+    z-index: 10;
+}
+#title:hover
+{
+    padding: 100px 100px;
 }
 
 #center
@@ -27,13 +53,44 @@ body
 
 #main 
 {
-    width: 99.5vw; 
-    height: 99vh; 
+    position: relative;
+    width: 100vw; 
+    height: 100vh; 
     margin: 0px;
     padding: 0px;
-    border: 3px solid darkcyan;
 }
-.deadlyBox {background-color: red; position: absolute; border-radius: 100%;}
 svg{ position: absolute; overflow: visible } /* well this is obviously necessary */
 .object {position: absolute; left: 0px; bottom: 0px; top: 0px; right: 0px;}
-
+.popIn
+{
+    outline: 20px dashed #00000000;
+    animation: pop 8s linear infinite;
+}
+@keyframes pop
+{
+    25%
+    {
+        outline: 5px dashed black;
+        outline-offset: 0px;
+        background-color: transparent;
+    }
+    26%
+    {
+        outline: 5px solid black;
+        background-color: black;
+    }
+    35% 
+    {
+        outline: 0px solid black;
+        outline-offset: 20px;
+    }
+    100%
+    {
+        outline: 0px solid black;
+        background-color: black;
+    }
+}
+.circle
+{
+    border-radius: 100%;
+}
