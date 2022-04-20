@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <head>
-    <link rel="stylesheet" href="main_style.css"></head>
+    <!--Font Link-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans&family=Akshar&display=swap" rel="stylesheet"> 
+    <!--Styles-->
+    <link rel="stylesheet" href="main_style.css">
+    <!--Scripts-->
     <script src="app.js"></script> <!--The main script-->
     <script src="input.js"></script> <!--Simple script that handles reading keyboard input every game loop frame-->
     <script src="collision.js"></script> <!--The melting pot of future-spaghetti code-->
@@ -8,15 +14,18 @@
 <body>
     <!--Main fits the whole screen-->
     <div id="main">
+        
         <!--Consider center to sort of the world, as objects will be appended to it, and as it is positioned to the center of the screen-->
         <div id="center">
-            <svg class="object" height="10" width="10">
-                <polygon points="-10,-10 -10,10 10,10 10,-10" style="fill:lime;stroke:purple;stroke-width:0" />
-            </svg>
-            <svg class="dummy" height="50" width ="50">
-                <polygon points="50,-50 50,-100 100,-100 100,-50" style="fill:red;stroke:purple;stroke-width:0" />
-            </svg>
+            <div id="border"></div>
+            <div class="object">
+                <div id="label" style="top: -100px; left:-60px; position: absolute; height: 40px; width: 120px; background-color: #fffa; z-index: 1;">Not Colliding</div>
+                <svg class="" height="10" width="10" style="z-index: 1;">
+                    <polygon points="-2,-2 -2,2 2,2 2,-2" style="fill:lime;stroke:purple;stroke-width:0" />
+                </svg>
+            </div>
         </div>
+        
     </div>
     
 </body>

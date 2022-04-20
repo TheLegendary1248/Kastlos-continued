@@ -124,6 +124,7 @@ class Collider
 
     
 }
+
 //---COLLISION DETECTION OBJECT---//
 const Collision = 
 {
@@ -154,7 +155,8 @@ const Collision =
                     {
                         if(objectA.shape.type == "AABB" & objectB.shape.type == "AABB") //Box on Box (aka nothing todo cuz we just checked that)
                         {
-
+                            if(objectA.onCollision) objectA.onCollision();
+                            if(objectB.onCollision) objectB.onCollision();
                         }
                         else if(objectA.shape.type == "Circle" & objectA.shape.type == "Circle") //Circle on Circle (the simplest)
                         {
@@ -162,7 +164,7 @@ const Collision =
                         }
                         else //Circle on Box(oh no)
                         {
-                            
+
                         }
                         //More in depth collision test
                     }
@@ -206,8 +208,6 @@ const Collision =
      */
     addObject(obj) //Basically an binary search to where to put the new object
     {
-        console.log("Added new object")
-        console.log(obj)
         if(obj instanceof Collider) //Make sure the object has a collider, of type collider
         {
             if(this.objects.length == 0) { this.objects.push(obj) } //Don't waste time on an empty array
