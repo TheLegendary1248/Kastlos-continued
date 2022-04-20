@@ -8,26 +8,43 @@ function onLoad(){
     player = document.querySelector(".object")
     world = document.getElementById("center")
     label = document.getElementById("label")
-    player.collider = new Collider(new AlignedBox(new Vec2(-2,-2), new Vec2(2,2)), new Vec2(0,0))
+    
     player.xVel = 0;
     player.yVel = 0;
-    player.collider.onCollision = () => {label.textContent = "Colliding!"; label.style.backgroundColor = "#00ff00aa" }
-    let deadlyBox = document.createElement("div")
-    deadlyBox.classList.add("deadlyBox")
+    
+    let deadlyObj = document.createElement("div")
+    deadlyObj.classList.add("deadlyBox")
     let prompt = window.prompt("Enter box spawn count. Defaults to 2000 if NaN")
     prompt = parseInt(prompt)
-    console.log(prompt)
+    let circle = true
+    if(!circle) player.collider = new Collider(new AlignedBox(new Vec2(-2, -2), new Vec2(2, 2)), new Vec2(0,0))
+    else player.collider = new Collider(new Circle(2), new Vec2(0,0))
+    player.collider.onCollision = () => {label.textContent = "Colliding!"; label.style.backgroundColor = "#00ff00aa" }
     for (let i = 0; i < (prompt || 2000); i++) {
+        let clone = deadlyObj.cloneNode()
+        if(circle)
+        {
+            let pos = new Vec2(Random(-800,800), Random(-370,350))
+            let rad = Random(4, 30)
+            clone.style.top = (-pos.y - rad) + "px"
+            clone.style.left = (pos.x - rad) + "px"
+            clone.style.height = 2 * rad + "px" //y-coords in html just had to be wierd and stupid
+            clone.style.width = 2 * rad + "px"
+            clone.collider = new Collider(new Circle(rad), pos)
+            world.appendChild(clone)
+        }
+        else
+        {
+            let min = new Vec2(Random(-800,800), Random(-370,350)) //Create a min
+            let max = new Vec2(Random(4,20) + min.x, Random(4,20) + min.y)
+            clone.style.top = -max.y + "px"
+            clone.style.left = min.x + "px"
+            clone.style.height = (max.y - min.y) + "px" //y-coords in html just had to be wierd and stupid
+            clone.style.width = (max.x - min.x) + "px"
+            clone.collider = new Collider(new AlignedBox(min, max), new Vec2(0,0)) 
+            world.appendChild(clone) 
+        }
         
-        let min = new Vec2(Random(-800,800), Random(-370,350)) //Create a min
-        let max = new Vec2(Random(4,20) + min.x, Random(4,20) + min.y)
-        let clone = deadlyBox.cloneNode()
-        clone.style.top = -max.y + "px"
-        clone.style.left = min.x + "px"
-        clone.style.height = (max.y - min.y) + "px" //y-coords in html just had to be wierd and stupid
-        clone.style.width = (max.x - min.x) + "px"
-        clone.collider = new Collider(new AlignedBox(min, max), new Vec2(0,0)) 
-        world.appendChild(clone) 
     }
     setInterval(gameLoop,0)
 }

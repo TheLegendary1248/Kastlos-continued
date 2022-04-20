@@ -16,14 +16,17 @@ class Vec2
         this.x = x;
         this.y = y;
     }
-    static add(a, b)
+    static Add(a, b)
     { return new Vec2(a.x + b.x, a.y + b.y) }
-    addSelf(a)
+    AddSelf(a)
     { this.x += a.x; this.y += a.y}
-    static sub(a, b)
+    static Sub(a, b)
     { return new Vec2(a.x - b.x, a.y - b.y) }
-    subSelf(a)
+    SubSelf(a)
     { this.x -= a.x; this.y -= a.y }
+    SqrDist()
+    {return (this.x ** 2 + this.y ** 2)}
+    Dist
 }
 class AABB //Axis Aligned Bounding Box, a box whose orientation is aligned with the axis of the world space, yes i know what it is
 {
@@ -63,12 +66,12 @@ class AlignedBox extends ColliderShape
     {
         if(aabb)
         {
-            aabb.min = Vec2.add(this.min, pos)
-            aabb.max = Vec2.add(this.max, pos)
+            aabb.min = Vec2.Add(this.min, pos)
+            aabb.max = Vec2.Add(this.max, pos)
         }
         else
         {
-            aabb = new AABB(new Vec2())
+            aabb = new AABB(Vec2.Add(this.min, pos), Vec2.Add(this.max, pos))
         }
         return aabb;
     }
@@ -80,6 +83,19 @@ class Circle extends ColliderShape
         super();
         this.radius = radius;
         this.type = "Circle";
+    }
+    GetAABB(pos, aabb)
+    {
+        if(aabb)
+        {
+            aabb.min = new Vec2(pos.x - this.radius, pos.y - this.radius)
+            aabb.max = new Vec2(pos.x + this.radius, pos.y + this.radius)
+        }
+        else
+        {
+            aabb = new AABB(new Vec2(pos.x - this.radius, pos.y - this.radius), new Vec2(pos.x + this.radius, pos.y + this.radius))
+        }
+        return aabb;
     }
 }
 //---COLLIDER---//
@@ -96,18 +112,19 @@ class Collider
         if(shape.type == "AABB") //Box
         {
             this.AABB = new AABB(
-                Vec2.add(pos, shape.min),
-                Vec2.add(pos, shape.max)
+                Vec2.Add(pos, shape.min),
+                Vec2.Add(pos, shape.max)
             )
             
         }
         else if(shape.type == "Circle")
         {
             this.AABB = new AABB(
-                Vec2.sub(pos, new Vec2(shape.radius, shape.radius)),
-                Vec2.add(pos, new Vec2(shape.radius, shape.radius))
+                Vec2.Sub(pos, new Vec2(shape.radius, shape.radius)),
+                Vec2.Add(pos, new Vec2(shape.radius, shape.radius))
             )
         }
+        this.internalShape = shape;
         this.shape = shape;
         this.internalPos = pos; //Consider this the "before" position. This is the position that will be used for checking collision on a frame 
         this.pos = pos; //Consider this the "after" position. This one can be changed via code and the internal position will be moved to this after collision was checked. This is to ensure that the objects are accurately sorted by position
@@ -153,14 +170,18 @@ const Collision =
                     //Check AABB overlap (and consider the fact that our AABB.min.x is already less than what is being checked against, along with the condition above)
                     if(objectA.AABB.max.y > objectB.AABB.min.y & objectB.AABB.max.y > objectA.AABB.min.y)
                     {
-                        if(objectA.shape.type == "AABB" & objectB.shape.type == "AABB") //Box on Box (aka nothing todo cuz we just checked that)
+                        if(objectA.internalShape.type == "AABB" & objectB.internalShape.type == "AABB") //Box on Box (aka nothing todo cuz we just checked that)
                         {
                             if(objectA.onCollision) objectA.onCollision();
                             if(objectB.onCollision) objectB.onCollision();
                         }
-                        else if(objectA.shape.type == "Circle" & objectA.shape.type == "Circle") //Circle on Circle (the simplest)
+                        else if(objectA.internalShape.type == "Circle" & objectA.internalShape.type == "Circle") //Circle on Circle (the simplest)
                         {
-
+                            if((objectA.internalShape.radius + objectB.internalShape.radius) ** 2 > Vec2.Sub(objectA.internalPos, objectB.internalPos).SqrDist())
+                            {
+                                if(objectA.onCollision) objectA.onCollision();
+                                if(objectB.onCollision) objectB.onCollision();
+                            }
                         }
                         else //Circle on Box(oh no)
                         {
@@ -176,6 +197,7 @@ const Collision =
 
             //Respond to shape change requests
             objectA.AABB = objectA.shape.GetAABB(objectA.pos, objectA.AABB) //Update AABB
+            objectA.internalShape = objectA.shape; //Change shape
             objectA.internalPos = objectA.pos; //Move collider
             //Change position in array if necessary
             let newIndex = index - 1
@@ -186,11 +208,12 @@ const Collision =
                 else break
             }
             newIndex++;
-            if(newIndex != index) arraymove(this.objects, index, newIndex); //If there's no change in order, avoid the uneccesary work of moving the element  
+            if(newIndex != index) Arraymove(this.objects, index, newIndex); //If there's no change in order, avoid the uneccesary work of moving the element  
         }
         //Leftover work for the last object
         let last = this.objects[this.objects.length - 1]
         last.AABB = last.shape.GetAABB(last.pos, last.AABB)
+        last.internalShape - last.shape
         last.internalPos = last.pos
         let newIndex = this.objects.length - 2
         while(newIndex > -1) //If the start of the array is reached, or the object before is NOT less x-wise, insert
@@ -200,7 +223,7 @@ const Collision =
             else break
         }
         newIndex++;
-        if(newIndex != this.objects.length - 1) arraymove(this.objects, this.objects.length - 1, newIndex) //If there's no change in order, avoid the uneccesary work of moving the element
+        if(newIndex != this.objects.length - 1) Arraymove(this.objects, this.objects.length - 1, newIndex) //If there's no change in order, avoid the uneccesary work of moving the element
     },
     /**
      * TO BE USED BY COLLIDER ONLY
@@ -234,7 +257,7 @@ const Collision =
  * @param {Number} fromIndex 
  * @param {Number} toIndex 
  */
-function arraymove(arr, fromIndex, toIndex) {
+function Arraymove(arr, fromIndex, toIndex) {
     var element = arr[fromIndex];
     arr.splice(fromIndex, 1);
     arr.splice(toIndex, 0, element);

@@ -33,7 +33,7 @@ body
     padding: 0px;
     border: 3px solid darkcyan;
 }
-.deadlyBox {background-color: red; position: absolute;}
+.deadlyBox {background-color: red; position: absolute; border-radius: 100%;}
 svg{ position: absolute; overflow: visible } /* well this is obviously necessary */
 .object {position: absolute; left: 0px; bottom: 0px; top: 0px; right: 0px;}
 
