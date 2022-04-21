@@ -26,7 +26,8 @@ class Vec2
     { this.x -= a.x; this.y -= a.y }
     SqrDist()
     {return (this.x ** 2 + this.y ** 2)}
-    Dist
+    Dist()
+    {return Math.SQRT2(this.x ** 2 + this.y ** 2)}
 }
 class AABB //Axis Aligned Bounding Box, a box whose orientation is aligned with the axis of the world space, yes i know what it is
 {
@@ -130,13 +131,13 @@ class Collider
         this.pos = pos; //Consider this the "after" position. This one can be changed via code and the internal position will be moved to this after collision was checked. This is to ensure that the objects are accurately sorted by position
         this.enabled = enabled || true //I read the docs, fool! Yes I comprehend how this works(ableit with some dif because it's new) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators
         //Basically, for the line above, incase enabled isn't a boolean, it's set to true by default
-        this.index = Collision.addObject(this) //Stores the index of the object in that array down there, for when we take an object out of the system
         this.onCollision = null //Callback function
-    
+        this.markedToDelete = false;
+        Collision.addObject(this) //Stores the index of the object in that array down there, for when we take an object out of the system
     }
     destructor() //Yes, i know this is not part of javascript, so i'll call it manually
     {
-        Collision.removeObject()
+        this.markedToDelete = true;
     }
 
     
@@ -157,38 +158,57 @@ const Collision =
         for (let index = 0; index < this.objects.length - 1; index++) 
         {
             const objectA = this.objects[index];
+            if(objectA.markedToDelete)
+            {
+                this.objects.splice(index--, 1)
+                continue;
+            }
             if(objectA.enabled) //If the collider is enabled for detection
             {
                 let ahead = index + 1;
                 let objectB = this.objects[ahead];
+                function callCollision() { if(objectA.onCollision) {objectA.onCollision();} if(objectB.onCollision) {objectB.onCollision();}}
                 //Check for collision with every object ahead of this one in the array via AABB
                 while(objectA.AABB.max.x > objectB.AABB.min.x)
                 {
-                    if(objectB.enabled)
-                    //Check if we want them to collide
-                    //...
-                    //Check AABB overlap (and consider the fact that our AABB.min.x is already less than what is being checked against, along with the condition above)
-                    if(objectA.AABB.max.y > objectB.AABB.min.y & objectB.AABB.max.y > objectA.AABB.min.y)
+                    if(!objectB.markedToDelete) //If the collider we're checking against is to be removed
                     {
-                        if(objectA.internalShape.type == "AABB" & objectB.internalShape.type == "AABB") //Box on Box (aka nothing todo cuz we just checked that)
+                        if(objectB.enabled) //If the collider we're checking against is enabled
                         {
-                            if(objectA.onCollision) objectA.onCollision();
-                            if(objectB.onCollision) objectB.onCollision();
-                        }
-                        else if(objectA.internalShape.type == "Circle" & objectA.internalShape.type == "Circle") //Circle on Circle (the simplest)
-                        {
-                            if((objectA.internalShape.radius + objectB.internalShape.radius) ** 2 > Vec2.Sub(objectA.internalPos, objectB.internalPos).SqrDist())
+                            if(objectA.AABB.max.y > objectB.AABB.min.y & objectB.AABB.max.y > objectA.AABB.min.y) //If AABB's overlaps
                             {
-                                if(objectA.onCollision) objectA.onCollision();
-                                if(objectB.onCollision) objectB.onCollision();
+                                //Prune phase(I presume is what this part is called). The more in depth collision test
+                                if(objectA.internalShape.type == "AABB" & objectB.internalShape.type == "AABB") //Box on Box (aka nothing todo cuz we just checked that)
+                                    callCollision()
+                                                                                //Hahaha this was objectA.... i hate myself
+                                else if(objectA.internalShape.type == "Circle" & objectB.internalShape.type == "Circle") //Circle on Circle (the simplest)
+                                {
+                                    if((objectA.internalShape.radius + objectB.internalShape.radius) ** 2 > Vec2.Sub(objectA.internalPos, objectB.internalPos).SqrDist())
+                                        callCollision()
+                                }
+                                else //Circle on Box(oh no)
+                                {
+                                    let box, circle
+                                    if(objectA.internalShape.type == "AABB") { box = objectA; circle = objectB; }
+                                    else { box = objectB; circle = objectA; }
+                                    //console.log(`${(box.AABB.min.x < circle.internalPos.x) & (circle.internalPos.x < box.AABB.max.x)}, ${(box.AABB.min.y < circle.internalPos.y) & (circle.internalPos.y < box.AABB.max.y)}`)
+                                    //If the circle origin lies in between either the x-span or y-span of the box AABB, then it's definitely colliding
+                                    if((box.AABB.min.x < circle.internalPos.x & circle.internalPos.x < box.AABB.max.x) | (box.AABB.min.y < circle.internalPos.y & circle.internalPos.y < box.AABB.max.y))
+                                        callCollision()
+                                    else
+                                    {
+                                        
+                                        let cornerPt = new Vec2( //Get the corner point of the box closest to the circle
+                                            box.AABB.max.x <= circle.pos.x ? box.AABB.max.x : box.AABB.min.x ,
+                                            box.AABB.max.y <= circle.pos.y ? box.AABB.max.y : box.AABB.min.y);
+                                        if(Vec2.Sub(circle.pos, cornerPt).SqrDist() < (circle.shape.radius ** 2)) //If the closest point is within range, call collision
+                                            callCollision()
+                                    }
+                                }
                             }
                         }
-                        else //Circle on Box(oh no)
-                        {
-                            
-                        }
-                        //More in depth collision test
                     }
+                    else { this.objects.splice(ahead--, 1)}
                     ahead++;
                     if(ahead >= this.objects.length) { break }
                     objectB = this.objects[ahead];

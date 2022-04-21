@@ -22,11 +22,14 @@ function onLoad(){
     else player.collider = new Collider(new Circle(2), new Vec2(0,0))
     player.collider.onCollision = () => {label.textContent = "Colliding!"; label.style.backgroundColor = "#00ff00aa" }
     for (let i = 0; i < (prompt || 150); i++) {
+        circle = Math.random() > 0.5
+        console.log(circle)
         let clone = deadlyObj.cloneNode()
         if(circle)
         {
+            clone.classList.add("circle")
             let pos = new Vec2(Random(-800,800), Random(-370,350))
-            let rad = Random(4, 30)
+            let rad = Random(20, 50)
             clone.style.top = (-pos.y - rad) + "px"
             clone.style.left = (pos.x - rad) + "px"
             clone.style.height = 2 * rad + "px" //y-coords in html just had to be wierd and stupid
@@ -37,12 +40,13 @@ function onLoad(){
         else
         {
             let min = new Vec2(Random(-800,800), Random(-370,350)) //Create a min
-            let max = new Vec2(Random(20,80) + min.x, Random(20,80) + min.y)
+            let max = new Vec2(Random(20,200) + min.x, Random(20,200) + min.y)
             clone.style.top = -max.y + "px"
             clone.style.left = min.x + "px"
             clone.style.height = (max.y - min.y) + "px" //y-coords in html just had to be wierd and stupid
             clone.style.width = (max.x - min.x) + "px"
             clone.collider = new Collider(new AlignedBox(min, max), new Vec2(0,0)) 
+            //clone.collider.onCollision = () => {clone.collider.destructor(); clone.remove();}
             world.appendChild(clone) 
         }
         
@@ -55,7 +59,7 @@ function Random(a, b)
 }
 function gameLoop()
 {
-    label.textContent = "Not Colliding"
+    label.textContent = `Not Colliding\n ${player.collider.pos.x}\n${player.collider.pos.y}`
     label.style.backgroundColor = "#ff0000aa"
     frameCounter += 1
     world.style.top = ((window.innerHeight / 2) + player.collider.pos.y) + "px";
