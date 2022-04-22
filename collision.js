@@ -269,16 +269,3 @@ const Collision =
         this.objects.splice(obj.index, 1);
     }
 }
-//https://stackoverflow.com/questions/5306680/move-an-array-element-from-one-array-position-to-another Move an array element from one index to another
-//I mean, i would've come up with this, but i was wondering if js was "feature-rich" enough to have a function with native code to deal with this
-/**
- * Moves an element in an array from one index to another
- * @param {Array} arr 
- * @param {Number} fromIndex 
- * @param {Number} toIndex 
- */
-function Arraymove(arr, fromIndex, toIndex) {
-    var element = arr[fromIndex];
-    arr.splice(fromIndex, 1);
-    arr.splice(toIndex, 0, element);
-}

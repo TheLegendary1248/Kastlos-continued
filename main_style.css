@@ -16,8 +16,8 @@ body
     position: absolute;
     height: 2000px;
     width: 2000px;
-    left: -500px;
-    top: -500px;
+    left: -1000px;
+    top: -1000px;
     outline: 10px dashed black;
     border-radius: 100%;
 }

@@ -53,15 +53,13 @@ function onLoad(){
     }
     setInterval(gameLoop,0)
 }
-function Random(a, b)
-{
-    return (Math.random() * (b - a)) + a
-}
+
 function gameLoop()
 {
     label.textContent = `Not Colliding\n ${player.collider.pos.x}\n${player.collider.pos.y}`
     label.style.backgroundColor = "#ff0000aa"
     frameCounter += 1
+    
     world.style.top = ((window.innerHeight / 2) + player.collider.pos.y) + "px";
     world.style.left = -(-(window.innerWidth / 2) + player.collider.pos.x) + "px";
     let inputVector = new Vec2(Input.horizontal, Input.vertical)
@@ -72,7 +70,7 @@ function gameLoop()
     player.velocity.x /= 1.06
     player.velocity.y /= 1.06
     player.collider.pos.AddSelf(player.velocity)
-    playerSVG.style.transform = `rotate(${(Math.atan2(inputVector.y, inputVector.x) * -180 / Math.PI) - 90}deg)`
+    playerSVG.style.transform = `rotate(${(Math.atan2(player.velocity.y, player.velocity.x) * -180 / Math.PI) - 90}deg)`
     console.log(player.style.transform)
     player.style.left = player.collider.pos.x + "px"
     player.style.top = -player.collider.pos.y + "px" 
@@ -92,6 +90,3 @@ function gameLoop()
     Collision.runDetection()
     
 }
-function Delay(time) {
-    return new Promise(resolve => setTimeout(resolve, time));
-  }
