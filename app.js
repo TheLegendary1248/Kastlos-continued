@@ -5,7 +5,11 @@ var player;
 var playerSVG;
 var world; //This is that "Center" object
 var label;
+var startTime;
+var timer;
 function onLoad(){
+    
+    timer = document.getElementById("timer")
     player = document.getElementById("player")
     playerSVG = document.getElementById("playerSVG")
     world = document.getElementById("center")
@@ -39,11 +43,14 @@ function onLoad(){
         }
         
     }
-    setInterval(gameLoop,0)
+    setInterval(gameLoop,8)
+    startTime = new Date().getTime();
 }
 
 function gameLoop()
 {
+    let nowTime = new Date().getTime() - startTime;
+    timer.textContent = `${Math.floor((nowTime % 3600000) / 60000)}m: ${('00' + Math.floor((nowTime % 60000) / 1000)).slice(-2)}s; ${('0000' + (nowTime % 1000)).slice(-3)}ms`;
     //Collision Detection Label
     label.textContent = `Not Colliding\n ${player.collider.pos.x}\n${player.collider.pos.y}`
     label.style.backgroundColor = "#ff0000aa"

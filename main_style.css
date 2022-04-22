@@ -14,10 +14,10 @@ body
 #border
 {
     position: absolute;
-    height: 2000px;
-    width: 2000px;
-    left: -1000px;
-    top: -1000px;
+    height: 1500px;
+    width: 1500px;
+    left: -750px;
+    top: -750px;
     outline: 10px dashed black;
     border-radius: 100%;
 }
@@ -69,6 +69,7 @@ body
     margin-top: 20px;
     font-size: 50px;
     text-align: right;
+    font-family: 'Akshar';
 }
 svg{ position: absolute; overflow: visible } /* well this is obviously necessary */
 .object {position: absolute; left: 0px; bottom: 0px; top: 0px; right: 0px;}
