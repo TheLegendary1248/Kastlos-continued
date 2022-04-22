@@ -14,15 +14,19 @@
 <body>
     <!--Main fits the whole screen-->
     <div id="main">
+        <!--Live Score Container-->
+        <div class="rightContainer" style="position: fixed; right: 10px; top: 10px; width: 15%;">
+            <div class="liveScore">3:12;46</div>
+            <div class="liveScore">456089</div>
+        </div>
         <div id="title">Kastlös</div>
         <!--Consider center to sort of the world, as objects will be appended to it, and as it is positioned to the center of the screen-->
         <div id="center">
             <div id="border"></div>
-            <div class="popIn circle" style="width: 80px; height: 80px; "></div>
-            <div class="object">
+            <div id="player">
                 <div id="label" style="top: -100px; left:-60px; position: absolute; height: 40px; width: 120px; background-color: #fffa; z-index: 1;">Not Colliding</div>
-                <svg class="" height="10" width="10" style="z-index: 1;">
-                    <polygon points="-2,-2 -2,2 2,2 2,-2" style="fill:lime;stroke:purple;stroke-width:0" />
+                <svg  height="10" width="10" style="z-index: 1;">
+                    <polygon id="playerSVG" points="0,4.5 6,-6 0,-3 -6,-6" style="fill:rgb(60, 136, 146);stroke:purple;stroke-width:0" />
                 </svg>
             </div>
         </div>

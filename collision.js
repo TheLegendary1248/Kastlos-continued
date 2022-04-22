@@ -27,7 +27,7 @@ class Vec2
     SqrDist()
     {return (this.x ** 2 + this.y ** 2)}
     Dist()
-    {return Math.SQRT2(this.x ** 2 + this.y ** 2)}
+    {return Math.sqrt(this.x ** 2 + this.y ** 2)}
 }
 class AABB //Axis Aligned Bounding Box, a box whose orientation is aligned with the axis of the world space, yes i know what it is
 {
