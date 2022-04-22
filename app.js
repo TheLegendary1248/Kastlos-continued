@@ -9,8 +9,8 @@ function onLoad(){
     player = document.getElementById("player")
     playerSVG = document.getElementById("playerSVG")
     world = document.getElementById("center")
+    world.pos = new Vec2(0,0)
     label = document.getElementById("label")
-    
     player.velocity = new Vec2(0,0)
     player.special = 1;
     let deadlyObj = document.createElement("div")
@@ -23,19 +23,12 @@ function onLoad(){
     player.collider.onCollision = () => {label.textContent = "Colliding!"; label.style.backgroundColor = "#00ff00aa" }
     for (let i = 0; i < (prompt || 150); i++) {
         circle = Math.random() > 0.5
-        let clone = deadlyObj.cloneNode()
-        if(circle)
+
+        if(true)
         {
-            clone.classList.add("circle")
-            let pos = new Vec2(Random(-800,800), Random(-370,350))
+            let pos = new Vec2(Random(-1000,1000), Random(-1000,1000))
             let rad = Random(20, 50)
-            clone.style.top = (-pos.y - rad) + "px"
-            clone.style.left = (pos.x - rad) + "px"
-            clone.style.height = 2 * rad + "px" //y-coords in html just had to be wierd and stupid
-            clone.style.width = 2 * rad + "px"
-            clone.collider = new Collider(new Circle(rad), pos)
-            clone.collider.onCollision = () => {clone.collider.destructor(); clone.remove();}
-            world.appendChild(clone)
+            Delay(Random(0, 20000)).then(() => new PopIn(new Circle(rad), pos))
         }
         else
         {
@@ -56,12 +49,16 @@ function onLoad(){
 
 function gameLoop()
 {
+    //Collision Detection Label
     label.textContent = `Not Colliding\n ${player.collider.pos.x}\n${player.collider.pos.y}`
     label.style.backgroundColor = "#ff0000aa"
     frameCounter += 1
-    
-    world.style.top = ((window.innerHeight / 2) + player.collider.pos.y) + "px";
-    world.style.left = -(-(window.innerWidth / 2) + player.collider.pos.x) + "px";
+    //Set the world position. This pretty much acts as the camera now...
+    newWorldPos = new Vec2(-(-(window.innerWidth / 2) + player.collider.pos.x) ,((window.innerHeight / 2) + player.collider.pos.y))
+    world.pos = Vec2.Lerp(world.pos, newWorldPos, 0.1)
+    world.style.top = world.pos.y + "px";
+    world.style.left = world.pos.x + "px";
+    //Input speed for the player
     let inputVector = new Vec2(Input.horizontal, Input.vertical)
     let normalize = inputVector.Dist()
     normalize *= 1.5
@@ -70,10 +67,11 @@ function gameLoop()
     player.velocity.x /= 1.06
     player.velocity.y /= 1.06
     player.collider.pos.AddSelf(player.velocity)
+    //Rotate player to direction of velocity
     playerSVG.style.transform = `rotate(${(Math.atan2(player.velocity.y, player.velocity.x) * -180 / Math.PI) - 90}deg)`
-    console.log(player.style.transform)
     player.style.left = player.collider.pos.x + "px"
     player.style.top = -player.collider.pos.y + "px" 
+    //Dash the player if possible and spacebar is pressed
     if(player.special) 
     { 
         if(Input.fire) 
@@ -85,8 +83,6 @@ function gameLoop()
             Delay(1500).then(() => {player.special = 1;})
         }
     }
-    //console.log(`Frame : ${frameCounter}, ${player.posx}, ${input.vertical}`)
-    //player.style.top = frameCounter + "px";
     Collision.runDetection()
     
 }

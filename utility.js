@@ -38,5 +38,5 @@ function Arraymove(arr, fromIndex, toIndex) {
  * @param {Number} t 
  * @returns {Number}
  */
-function Lerp(a, b, t)
+function Lerp(a, b, t) //https://docs.unity3d.com/ScriptReference/Vector3.Lerp.html It's C#, yes, but the psuedo code provided works by itself anyways
 { return a + (b - a) * t}

@@ -28,6 +28,26 @@ class Vec2
     {return (this.x ** 2 + this.y ** 2)}
     Dist()
     {return Math.sqrt(this.x ** 2 + this.y ** 2)}
+    /**
+     * Interpolates from vector start to end by 't'. This is unclamped
+     * @param {Vec2} start 
+     * @param {Vec2} end 
+     * @param {Number} t 
+     */
+    static Lerp(a, b, t)
+    {
+        return new Vec2(Lerp(a.x, b.x, t), Lerp(a.y, b.y, t))
+    }
+    /**
+     * Interpolates this vector towards the destination vector by 't'
+     * @param {Vec2} dest The destination vector  
+     * @param {Number} t The interpolation value
+     */
+    LerpSelf(dest, t)
+    {
+        this.x = Lerp(this.x, dest.x, t)
+        this.y = Lerp(this.y, dest.y, t)
+    }
 }
 class AABB //Axis Aligned Bounding Box, a box whose orientation is aligned with the axis of the world space, yes i know what it is
 {
@@ -129,8 +149,9 @@ class Collider
         this.shape = shape;
         this.internalPos = pos; //Consider this the "before" position. This is the position that will be used for checking collision on a frame 
         this.pos = pos; //Consider this the "after" position. This one can be changed via code and the internal position will be moved to this after collision was checked. This is to ensure that the objects are accurately sorted by position
-        this.enabled = enabled || true //I read the docs, fool! Yes I comprehend how this works(ableit with some dif because it's new) https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Expressions_and_Operators
-        //Basically, for the line above, incase enabled isn't a boolean, it's set to true by default
+        console.log(enabled ?? true)
+        this.enabled = enabled ?? true; //yea i should'a saw that coming a mile away
+        
         this.onCollision = null //Callback function
         this.markedToDelete = false;
         Collision.addObject(this) //Stores the index of the object in that array down there, for when we take an object out of the system
