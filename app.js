@@ -16,15 +16,15 @@ function onLoad(){
     let deadlyObj = document.createElement("div")
     deadlyObj.classList.add("object")
     deadlyObj.classList.add("popIn")
-    let prompt = window.prompt("Enter box spawn count. Defaults to 2000 if NaN")
+    let prompt = window.prompt("Enter box spawn count. Defaults to 500 if NaN")
     prompt = parseInt(prompt)
     let circle = false
     player.collider = new Collider(new Circle(3), new Vec2(0,0))
     player.collider.onCollision = () => {label.textContent = "Colliding!"; label.style.backgroundColor = "#00ff00aa" }
-    for (let i = 0; i < (prompt || 150); i++) {
+    for (let i = 0; i < (prompt || 500); i++) {
         circle = Math.random() > 0.5
 
-        if(true)
+        if(circle)
         {
             let pos = new Vec2(Random(-1000,1000), Random(-1000,1000))
             let rad = Random(20, 50)
@@ -32,15 +32,10 @@ function onLoad(){
         }
         else
         {
-            let min = new Vec2(Random(-800,800), Random(-370,350)) //Create a min
-            let max = new Vec2(Random(20,200) + min.x, Random(20,200) + min.y)
-            clone.style.top = -max.y + "px"
-            clone.style.left = min.x + "px"
-            clone.style.height = (max.y - min.y) + "px" //y-coords in html just had to be wierd and stupid
-            clone.style.width = (max.x - min.x) + "px"
-            clone.collider = new Collider(new AlignedBox(min, max), new Vec2(0,0)) 
-            clone.collider.onCollision = () => {clone.collider.destructor(); clone.remove();}
-            world.appendChild(clone) 
+            let min = new Vec2(Random(-100,-50), Random(-100,-50)) //Create a min
+            let max = new Vec2(Random(50,100), Random(50, 100))
+            let pos = new Vec2(Random(-1000,1000), Random(-1000, 1000))
+            Delay(Random(0, 20000)).then(() => new PopIn(new AlignedBox(min, max), pos))
         }
         
     }

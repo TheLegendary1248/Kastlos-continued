@@ -23,8 +23,9 @@ class PopIn{
         }
         else
         {
-            clone.style.top = -shape.max.y + "px"
-            clone.style.left = shape.min.x + "px"
+
+            clone.style.top = -(shape.max.y + pos.y) + "px"
+            clone.style.left = (shape.min.x + pos.x) + "px"
             clone.style.height = (shape.max.y - shape.min.y) + "px" //y-coords in html just had to be wierd and stupid
             clone.style.width = (shape.max.x - shape.min.x) + "px"
             
@@ -34,5 +35,6 @@ class PopIn{
         Delay(7600).then(() => {clone.collider.destructor();})
         Delay(8000).then(() => {clone.remove();})
         world.appendChild(clone)
-}
+        return clone
+    }
 }

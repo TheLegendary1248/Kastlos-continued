@@ -49,6 +49,9 @@ class Vec2
         this.y = Lerp(this.y, dest.y, t)
     }
 }
+/**
+ * The class for holding AABB data
+ */
 class AABB //Axis Aligned Bounding Box, a box whose orientation is aligned with the axis of the world space, yes i know what it is
 {
     /** @param {Vec2} min The lower left point @param {Vec2} max The higher right point */
@@ -68,6 +71,9 @@ class ColliderShape
      */
    GetAABB(pos, aabb) {return null;} 
 }   
+/**
+ * The class for representing an AABB as a collider
+ */
 class AlignedBox extends ColliderShape
 {
     /**
@@ -149,7 +155,6 @@ class Collider
         this.shape = shape;
         this.internalPos = pos; //Consider this the "before" position. This is the position that will be used for checking collision on a frame 
         this.pos = pos; //Consider this the "after" position. This one can be changed via code and the internal position will be moved to this after collision was checked. This is to ensure that the objects are accurately sorted by position
-        console.log(enabled ?? true)
         this.enabled = enabled ?? true; //yea i should'a saw that coming a mile away
         
         this.onCollision = null //Callback function
