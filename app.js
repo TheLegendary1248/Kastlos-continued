@@ -9,7 +9,25 @@ var startTime;
 var timer;
 var intervalId;
 var scoreContainer;
-const frame = new EventTarget(); //Pls work
+var objectInterval;
+const frame = //Wow this was put together friggen quickly
+{
+    dict: {},
+    currentId: 0,
+    addCallback(e)
+    {
+        this.dict[this.currentId] = e
+        return this.currentId++
+    },
+    removeCallback(e)
+    {
+        delete this.dict[e]
+    },
+    callFrame()
+    {
+      Object.keys(this.dict).forEach((e) => this.dict[e]())  
+    }
+}
 function onLoad(){
     scoreContainer = document.getElementById("scoreContainer")
     timer = document.getElementById("timer")
@@ -18,38 +36,46 @@ function onLoad(){
     world = document.getElementById("center")
     world.pos = new Vec2(0,0)
     label = document.getElementById("label")
+    
     player.velocity = new Vec2(0,0)
     player.special = 1;
-    let deadlyObj = document.createElement("div")
-    deadlyObj.classList.add("object")
-    deadlyObj.classList.add("popIn")
-    let prompt = window.prompt("Enter box spawn count. Defaults to 500 if NaN")
-    prompt = parseInt(prompt)
-    let circle = false
-    player.collider = new Collider(new Circle(3), new Vec2(0,0))
-    player.collider.onCollision = () => {label.textContent = "Colliding!"; label.style.backgroundColor = "#00ff00aa" }
-    for (let i = 0; i < (prompt || 500); i++) {
-        circle = Math.random() > 0.5
 
+    player.collider = new Collider(new Circle(3), new Vec2(0,0))
+    //player.collider.onCollision = () => {label.textContent = "Colliding!"; label.style.backgroundColor = "#00ff00aa" }
+    intervalId = setInterval(gameLoop,8)
+    Spawn()
+    objectInterval = setInterval(Spawn, 5000)
+    startTime = new Date().getTime();
+}
+let objCount = 10
+let wave = 0
+function Spawn()
+{
+    let circle = false;
+    objCount += wave * 0.7
+    for (let i = 0; i < objCount; i++) {
+        circle = Math.random() > 0.5
+        let pos = new Vec2(Random(-750,750), Random(-750,750))
+        let vel
+        if(wave > 2) vel = new Vec2(Random(-2,2), Random(-2,2))
+        let delay
+        if(wave > 4) delay = Random(500, 4000)
         if(circle)
         {
             let pos = new Vec2(Random(-1000,1000), Random(-1000,1000))
-            let rad = Random(20, 50)
-            Delay(Random(0, 20000)).then(() => new PopIn(new Circle(rad), pos))
+            let rad = Random(10, 30)
+            Delay(Random(0, 2000)).then(() => new PopIn(new Circle(rad), pos, vel, delay))
         }
         else
         {
-            let min = new Vec2(Random(-100,-50), Random(-100,-50)) //Create a min
-            let max = new Vec2(Random(50,100), Random(50, 100))
-            let pos = new Vec2(Random(-1000,1000), Random(-1000, 1000))
-            Delay(Random(0, 20000)).then(() => new PopIn(new AlignedBox(min, max), pos))
+            let min = new Vec2(Random(-50,-25), Random(-50,-25)) //Create a min
+            let max = new Vec2(Random(25,50), Random(25, 50))
+            Delay(Random(0, 2000)).then(() => new PopIn(new AlignedBox(min, max), pos, vel, delay))
         }
-        
     }
-    intervalId = setInterval(gameLoop,8)
-    startTime = new Date().getTime();
+    console.log(++wave)
+    console.log(objCount)
 }
-
 function gameLoop()
 {
     //Update timer
@@ -57,8 +83,10 @@ function gameLoop()
     let nowTime = new Date().getTime() - startTime;
     timer.textContent = `${Math.floor((nowTime % 3600000) / 60000)}m: ${('00' + Math.floor((nowTime % 60000) / 1000)).slice(-2)}s; ${('0000' + (nowTime % 1000)).slice(-3)}ms`;
     //Collision Detection Label
+    /*
     label.textContent = `Not Colliding\n ${player.collider.pos.x}\n${player.collider.pos.y}`
     label.style.backgroundColor = "#ff0000aa"
+    */
     frameCounter += 1
     //Set the world position. This pretty much acts as the camera now...
     newWorldPos = new Vec2(-(-(window.innerWidth / 2) + player.collider.pos.x) ,((window.innerHeight / 2) + player.collider.pos.y))
@@ -91,12 +119,14 @@ function gameLoop()
             Delay(1500).then(() => {player.special = 1;})
         }
     }
+    if(player.collider.pos.SqrDist() > (750 ** 2)) gameOver()
+    frame.callFrame()
     Collision.runDetection()
-    
 }
 function gameOver()
 {
     world.classList.add("worldGameOver")
     scoreContainer.classList.add("scoreGameOver")
     clearInterval(intervalId)
+    clearInterval(objectInterval)
 }

@@ -11,7 +11,10 @@ class PopIn{
      */
     constructor(shape, pos, velocity, delay)
     {
-        let clone = div.cloneNode()
+        this.clone = div.cloneNode();
+        let clone = this.clone;
+        this.pos = pos;
+        let self = this;
         clone.classList.add("popIn")
         if(shape.type == "Circle")
         {
@@ -28,11 +31,45 @@ class PopIn{
             clone.style.height = (shape.max.y - shape.min.y) + "px" //y-coords in html just had to be wierd and stupid
             clone.style.width = (shape.max.x - shape.min.x) + "px"
         }
-        clone.collider = new Collider(shape, pos, false)
-        Delay(2000).then(() => {clone.collider.enabled = true;})
-        Delay(7600).then(() => {clone.collider.destructor();})
-        Delay(8000).then(() => {clone.remove();})
+        if(velocity)
+        {
+            this.velocity = velocity
+            if(delay) 
+                Delay(delay).then(() =>
+                    {
+                        self.frameId = frame.addCallback(() => {self.Move()})
+                    } 
+                )
+            else this.frameId = frame.addCallback(() => {self.Move()})
+            Delay(7600).then(() => {self.Remove()})
+        }
+        this.collider = new Collider(shape, pos, false)
+        
+        Delay(2000).then(() => {self.collider.enabled = true;})
+        Delay(7600).then(() => {self.collider.destructor();})
+        Delay(8000).then(() => {self.clone.remove();})
         world.appendChild(clone)
-        return clone
     }
+    Move()
+    {
+        this.pos.AddSelf(this.velocity)
+        let shape = this.collider.shape
+        let pos = this.pos
+        if(this.collider.shape.type == "Circle")
+        {
+            this.clone.classList.add("circle")
+            this.clone.style.top = (-pos.y - shape.radius) + "px"
+            this.clone.style.left = (pos.x - shape.radius) + "px"
+            this.clone.style.height = 2 * shape.radius + "px" 
+            this.clone.style.width = 2 * shape.radius + "px"
+        }
+        else
+        {
+            this.clone.style.top = -(shape.max.y + pos.y) + "px"
+            this.clone.style.left = (shape.min.x + pos.x) + "px"
+            this.clone.style.height = (shape.max.y - shape.min.y) + "px" 
+            this.clone.style.width = (shape.max.x - shape.min.x) + "px"
+        }
+    }
+    Remove() {frame.removeCallback(this.frameId)}
 }
