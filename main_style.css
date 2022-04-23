@@ -70,6 +70,24 @@ body
     font-size: 50px;
     text-align: right;
     font-family: 'Akshar';
+    color: white;
+    text-shadow: 4px 4px 0px black;
+}
+.scoreGameOver
+{
+    animation: scoreGameOver 1s ease-out forwards;
+}
+@keyframes scoreGameOver
+{
+    to{
+        top: 50%;
+        right: 50%;
+        transform: translate(50%,-50%);
+    }
+}
+.worldGameOver { animation: worldGameOver 1s ease-out forwards;}
+@keyframes worldGameOver {
+    to{ filter: blur(3px) opacity(0.5);}
 }
 svg{ position: absolute; overflow: visible } /* well this is obviously necessary */
 .object {position: absolute; left: 0px; bottom: 0px; top: 0px; right: 0px;}

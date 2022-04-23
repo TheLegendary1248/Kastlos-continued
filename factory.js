@@ -23,12 +23,10 @@ class PopIn{
         }
         else
         {
-
             clone.style.top = -(shape.max.y + pos.y) + "px"
             clone.style.left = (shape.min.x + pos.x) + "px"
             clone.style.height = (shape.max.y - shape.min.y) + "px" //y-coords in html just had to be wierd and stupid
             clone.style.width = (shape.max.x - shape.min.x) + "px"
-            
         }
         clone.collider = new Collider(shape, pos, false)
         Delay(2000).then(() => {clone.collider.enabled = true;})

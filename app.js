@@ -7,8 +7,11 @@ var world; //This is that "Center" object
 var label;
 var startTime;
 var timer;
+var intervalId;
+var scoreContainer;
+const frame = new EventTarget(); //Pls work
 function onLoad(){
-    
+    scoreContainer = document.getElementById("scoreContainer")
     timer = document.getElementById("timer")
     player = document.getElementById("player")
     playerSVG = document.getElementById("playerSVG")
@@ -43,12 +46,14 @@ function onLoad(){
         }
         
     }
-    setInterval(gameLoop,8)
+    intervalId = setInterval(gameLoop,8)
     startTime = new Date().getTime();
 }
 
 function gameLoop()
 {
+    //Update timer
+    //https://stackoverflow.com/questions/10073699/pad-a-number-with-leading-zeros-in-javascript Ty so much ppl of the internet
     let nowTime = new Date().getTime() - startTime;
     timer.textContent = `${Math.floor((nowTime % 3600000) / 60000)}m: ${('00' + Math.floor((nowTime % 60000) / 1000)).slice(-2)}s; ${('0000' + (nowTime % 1000)).slice(-3)}ms`;
     //Collision Detection Label
@@ -69,6 +74,7 @@ function gameLoop()
     player.velocity.x /= 1.06
     player.velocity.y /= 1.06
     player.collider.pos.AddSelf(player.velocity)
+    player.collider.onCollision = gameOver
     //Rotate player to direction of velocity
     playerSVG.style.transform = `rotate(${(Math.atan2(player.velocity.y, player.velocity.x) * -180 / Math.PI) - 90}deg)`
     player.style.left = player.collider.pos.x + "px"
@@ -87,4 +93,10 @@ function gameLoop()
     }
     Collision.runDetection()
     
+}
+function gameOver()
+{
+    world.classList.add("worldGameOver")
+    scoreContainer.classList.add("scoreGameOver")
+    clearInterval(intervalId)
 }
