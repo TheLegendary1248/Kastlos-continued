@@ -1,5 +1,6 @@
 
-document.addEventListener("DOMContentLoaded", onLoad)
+//document.addEventListener("DOMContentLoaded", onLoad)
+var main;
 var frameCounter = 0;
 var player;
 var playerSVG;
@@ -10,6 +11,7 @@ var timer;
 var intervalId;
 var scoreContainer;
 var objectInterval;
+var title;
 const frame = //Wow this was put together friggen quickly
 {
     dict: {},
@@ -29,6 +31,10 @@ const frame = //Wow this was put together friggen quickly
     }
 }
 function onLoad(){
+    main = document.getElementById("main")
+    main.classList.add("start")
+    title = document.getElementById("title")
+    title.classList.add("fadeTitle")
     scoreContainer = document.getElementById("scoreContainer")
     timer = document.getElementById("timer")
     player = document.getElementById("player")

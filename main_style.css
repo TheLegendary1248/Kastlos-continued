@@ -23,7 +23,6 @@ body
 }
 #title
 {
-    display: none;
     transition: padding 0.4s;
     color: white;
     position: absolute;
@@ -57,12 +56,21 @@ body
 
 #main 
 {
+    filter: opacity(0);
     position: relative;
     width: 100vw; 
     height: 100vh; 
     margin: 0px;
     padding: 0px;
 }
+.start{ animation: startGame 1s ease-out forwards;}
+@keyframes startGame
+{ to {filter: opacity(1); } }
+.fadeTitle { animation: fadeTitle 1s ease-out forwards;}
+@keyframes fadeTitle {
+    to{filter: opacity(0) blur(10px);}
+}
+
 .liveScore{
     border-bottom: 10px outset black;
     border-left: 10px outset black;
