@@ -16,18 +16,29 @@ class Vec2
         this.x = x;
         this.y = y;
     }
+    //Addition Functions
     static Add(a, b)
     { return new Vec2(a.x + b.x, a.y + b.y) }
     AddSelf(a)
     { this.x += a.x; this.y += a.y}
+    //Subtraction Functions
     static Sub(a, b)
     { return new Vec2(a.x - b.x, a.y - b.y) }
     SubSelf(a)
     { this.x -= a.x; this.y -= a.y }
+    /**
+     * Gets the distance squared of this vector
+     * @returns {Number}
+     */
     SqrDist()
     {return (this.x ** 2 + this.y ** 2)}
+    /**
+     * Gets the distance of this vector
+     * @returns 
+     */
     Dist()
     {return Math.sqrt(this.x ** 2 + this.y ** 2)}
+    //Linear Interpolation Functions
     /**
      * Interpolates from vector start to end by 't'. This is unclamped
      * @param {Vec2} start 
@@ -132,7 +143,7 @@ class Collider
     /**
     * @param {ColliderShape} shape The shape our collider takes on
     * @param {Vec2} pos The position of the collider
-    * @param {Boolean} enabled Should the collider start enabled
+    * @param {Boolean} enabled Should the collider start enabled. Default to true
     */
     constructor(shape, pos, enabled) 
     {
@@ -151,14 +162,14 @@ class Collider
                 Vec2.Add(pos, new Vec2(shape.radius, shape.radius))
             )
         }
-        this.internalShape = shape;
-        this.shape = shape;
+        this.internalShape = shape; //Consider this the "before" shape
+        this.shape = shape; //Consider this the "after" shape
         this.internalPos = pos; //Consider this the "before" position. This is the position that will be used for checking collision on a frame 
         this.pos = pos; //Consider this the "after" position. This one can be changed via code and the internal position will be moved to this after collision was checked. This is to ensure that the objects are accurately sorted by position
         this.enabled = enabled ?? true; //yea i should'a saw that coming a mile away
         
         this.onCollision = null //Callback function
-        this.markedToDelete = false;
+        this.markedToDelete = false;//Gets set to true
         Collision.addObject(this) //Stores the index of the object in that array down there, for when we take an object out of the system
     }
     destructor() //Yes, i know this is not part of javascript, so i'll call it manually
@@ -184,6 +195,7 @@ const Collision =
         for (let index = 0; index < this.objects.length - 1; index++) 
         {
             const objectA = this.objects[index];
+            //If we're marked to delete, remove us
             if(objectA.markedToDelete)
             {
                 this.objects.splice(index--, 1)
@@ -194,7 +206,7 @@ const Collision =
                 let ahead = index + 1;
                 let objectB = this.objects[ahead];
                 function callCollision() { if(objectA.onCollision) {objectA.onCollision();} if(objectB.onCollision) {objectB.onCollision();}}
-                //Check for collision with every object ahead of this one in the array via AABB
+                //Check for collision with every object ahead of this one in the array via AABB. Sweep phase
                 while(objectA.AABB.max.x > objectB.AABB.min.x)
                 {
                     if(!objectB.markedToDelete) //If the collider we're checking against is to be removed
@@ -223,8 +235,8 @@ const Collision =
                                         callCollision()
                                     else
                                     {
-                                        
-                                        let cornerPt = new Vec2( //Get the corner point of the box closest to the circle
+                                        //Get the corner point of the box closest to the circle
+                                        let cornerPt = new Vec2( 
                                             box.AABB.max.x <= circle.pos.x ? box.AABB.max.x : box.AABB.min.x ,
                                             box.AABB.max.y <= circle.pos.y ? box.AABB.max.y : box.AABB.min.y);
                                         if(Vec2.Sub(circle.pos, cornerPt).SqrDist() < (circle.shape.radius ** 2)) //If the closest point is within range, call collision
@@ -234,9 +246,11 @@ const Collision =
                             }
                         }
                     }
+                    //Remove the other object if marked to delete
                     else { this.objects.splice(ahead--, 1)}
                     ahead++;
-                    if(ahead >= this.objects.length) { break }
+                    //If at end of list, break out the loop, otherwise move onto the next object
+                    if(ahead >= this.objects.length) { break; }
                     objectB = this.objects[ahead];
                 }
             }
@@ -290,7 +304,7 @@ const Collision =
      * TO BE USED BY COLLIDER ONLY
      * @param {Collider} obj The collider to be removed 
      */
-    removeObject(obj) //
+    removeObject(obj) //THIS FUNCTION IS UNUSED
     {
         this.objects.splice(obj.index, 1);
     }

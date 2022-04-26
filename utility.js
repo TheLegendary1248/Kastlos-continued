@@ -9,14 +9,16 @@ function Random(min, max)
 {
     return (Math.random() * (max - min)) + min
 }
+
 /**
  * A simple delay function to attach a callback to a promise
- * @param {Number} time 
- * @returns {Promise}
+ * @param {Number} time Milliseconds to set the delay to 
+ * @param {Function} func Function to call at end of delay. Automatically wrapped with arrow functions
+ * @returns {Promise} Returns the promise with the set delay, and will call the callback given, if supplied
  */
 function Delay(time) {
     return new Promise(resolve => setTimeout(resolve, time));
-  }
+}
 
 //https://stackoverflow.com/questions/5306680/move-an-array-element-from-one-array-position-to-another Move an array element from one index to another
 //I mean, i would've come up with this, but i was wondering if js was "feature-rich" enough to have a function with native code to deal with this
@@ -31,8 +33,9 @@ function Arraymove(arr, fromIndex, toIndex) {
     arr.splice(fromIndex, 1);
     arr.splice(toIndex, 0, element);
 }
+
 /**
- * 
+ * Linear interpolation from value a to b by t
  * @param {Number} a 
  * @param {Number} b 
  * @param {Number} t 

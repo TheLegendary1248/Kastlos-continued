@@ -16,10 +16,19 @@ body
     position: absolute;
     height: 1500px;
     width: 1500px;
-    left: -750px;
-    top: -750px;
+    left: -770px;
+    top: -770px;
     outline: 10px dashed black;
     border-radius: 100%;
+    animation: borderAnim 8s linear forwards infinite;
+    border: 20px dashed black;
+    outline: 20px dashed black;
+    outline-offset: -20px;
+    
+}
+@keyframes borderAnim
+{
+    to{ transform: rotate(90deg); outline: 20px dashed #00000000; outline-offset: 200px;}
 }
 #title
 {
@@ -68,7 +77,7 @@ body
 { to {filter: opacity(1); } }
 .fadeTitle { animation: fadeTitle 1s ease-out forwards;}
 @keyframes fadeTitle {
-    to{filter: opacity(0) blur(10px);}
+    to{filter: opacity(0) blur(10px); pointer-events: none;}
 }
 
 .liveScore{
@@ -138,4 +147,10 @@ svg{ position: absolute; overflow: visible } /* well this is obviously necessary
 .circle
 {
     border-radius: 100%;
+}
+.dashImpact 
+{animation: dash 0.5s ease-out forwards; border-radius: 100%;}
+@keyframes dash {
+    from { outline: 20px solid black;}
+    to {outline: 0px solid black; outline-offset: 60px;} 
 }
