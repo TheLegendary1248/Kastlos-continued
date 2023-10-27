@@ -9,7 +9,7 @@ function Random(min, max)
 {
     return (Math.random() * (max - min)) + min
 }
-
+function RandomWithinArena () { return new Vec2(-(ArenaSize/2), (ArenaSize/2)) }
 /**
  * A simple delay function to attach a callback to a promise
  * @param {Number} time Milliseconds to set the delay to 
@@ -43,3 +43,25 @@ function Arraymove(arr, fromIndex, toIndex) {
  */
 function Lerp(a, b, t) //https://docs.unity3d.com/ScriptReference/Vector3.Lerp.html It's C#, yes, but the psuedo code provided works by itself anyways
 { return a + (b - a) * t}
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+/**
+ * 
+ * https://stackoverflow.com/questions/1344500/efficient-way-to-insert-a-number-into-a-sorted-array-of-numbers
+ */
+function sortedIndex(array, value) {
+    var low = 0,
+        high = array.length;
+
+    while (low < high) {
+        var mid = (low + high) >>> 1;
+        if (array[mid] < value) low = mid + 1;
+        else high = mid;
+    }
+    return low;
+}
+

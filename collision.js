@@ -1,9 +1,3 @@
-//This is my collision system scrapped together from the depths of my mind. 
-//Can i figure something out without stack overflow
-/*
-So i've skimmed passages on real-time collision for video games out of curiosity since i make games on my own time
-Im going to try my hand sweep and prune, or whatever that quite means 
-*/
 //--Vector 2 Data Object--//
 class Vec2 
 {
@@ -26,6 +20,37 @@ class Vec2
     { return new Vec2(a.x - b.x, a.y - b.y) }
     SubSelf(a)
     { this.x -= a.x; this.y -= a.y }
+    /**
+     * Multiplies the vector by a scalar
+     * @param {Number | Vec2} a 
+     */
+    ScaleSelf(a)
+    {
+        if(isNaN(a))
+        {
+            this.x *= a.x;
+            this.y *= a.y
+        }
+        else{
+            this.x *= a;
+            this.y *= a;
+        }
+    }
+    /**
+     * Multiplies the vector by b, or returns the product of both
+     * @param {Vec2} a 
+     * @param {Number | Vec2} b 
+     */
+    static Scale(a,b)
+    {
+        if(isNaN(b))
+        {
+            return new Vec2(a.x * b.x, a.y * b.y)
+        }
+        else{
+            return new Vec2(a.x * b, a.y * b)
+        }
+    }
     /**
      * Gets the distance squared of this vector
      * @returns {Number}
@@ -59,6 +84,14 @@ class Vec2
         this.x = Lerp(this.x, dest.x, t)
         this.y = Lerp(this.y, dest.y, t)
     }
+    Clone()
+    {
+        return new Vec2(this.x, this.y);
+    }
+}
+//This is for later
+class ObjectContainer{
+    
 }
 /**
  * The class for holding AABB data
@@ -71,6 +104,7 @@ class AABB //Axis Aligned Bounding Box, a box whose orientation is aligned with 
         this.min = min
         this.max = max
     }
+    Clone() {return new AABB(this.min, this.max);}
 }
 //---COLLIDER SHAPE DEFINITIONS---//
 class ColliderShape 
@@ -294,9 +328,15 @@ const Collision =
         if(obj instanceof Collider) //Make sure the object has a collider, of type collider
         {
             if(this.objects.length == 0) { this.objects.push(obj) } //Don't waste time on an empty array
-            else
+            else //Binary Search to spot in list
             {
-                this.objects.push(obj)
+                let low = 0, high = this.objects.length;
+                while (low < high) {
+                    let mid = (low + high) >>> 1;
+                    if (this.objects[mid].AABB.min.x < obj.AABB.min.x) low = mid + 1;
+                    else high = mid;
+                }
+                this.objects.splice(low, 0, obj)
             }
         }
     } ,

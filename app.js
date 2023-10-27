@@ -47,7 +47,7 @@ const gameLoop = //A sort of homebrewed event system, calling every callback att
      */
     callFrame()
     {
-      Object.keys(this.dict).forEach((e) => this.dict[e]())  
+      Object.keys(this.dict).forEach((e) => this.dict[e](), 5)  
     }
 }
 function onLoad(){
@@ -70,44 +70,36 @@ function onLoad(){
     player.collider.onCollision = gameOver
     //Start the gameloop
     intervalId = setInterval(mainLoop,8)
-    Spawn()
-    objectInterval = setInterval(Spawn, 5000)
+    //Spawn()
+    //objectInterval = setInterval(Spawn, 10000)
     //Get start time of the game
     startTime = new Date().getTime();
 }
-let objCount = 10
+let objCount = 2
 let wave = 0
+const ArenaSize = 1500
+let wavePatterns = 
+{
+    0:[
+        () => new PopIn(new Circle(Random(20, 100)), RandomWithinArena()),
+        () => new PopIn(new AlignedBox( new Vec2(Random(25,50), Random(25, 50)), new Vec2(Random(-50,-25), Random(-50,-25))), RandomWithinArena()),
+    ],
+    2:[
+        () => new PopIn(new Circle(Random(20, 100)), RandomWithinArena()),
+        () => new PopIn(new AlignedBox( new Vec2(Random(25,50), Random(25, 50)), new Vec2(Random(-50,-25), Random(-50,-25))), RandomWithinArena()),
+    ]
+}
+
 function Spawn()
 {
     //Very basic spawning algorithm
     let circle = false;
-    objCount += wave * 0.7
+    objCount += wave * 0.1
     for (let i = 0; i < objCount; i++) {
-        circle = Math.random() > 0.5
-        let pos = new Vec2(Random(-750,750), Random(-750,750))
-        //Set a velocity on Waves 2+
-        let vel
-        if(wave > 2) vel = new Vec2(Random(-2,2), Random(-2,2))
-        let delay
-        //Set a delay on the velocity on Waves 4+
-        if(wave > 4) delay = Random(500, 4000)
-        if(circle)
-        {
-            //Randomize values for the circle
-            let pos = new Vec2(Random(-1000,1000), Random(-1000,1000))
-            let rad = Random(10, 30)
-            Delay(Random(0, 2000)).then(() => new PopIn(new Circle(rad), pos, vel, delay))
-        }
-        else
-        {
-            //Randomize values for the rectangle
-            let min = new Vec2(Random(-50,-25), Random(-50,-25)) //Create a min
-            let max = new Vec2(Random(25,50), Random(25, 50))
-            Delay(Random(0, 2000)).then(() => new PopIn(new AlignedBox(min, max), pos, vel, delay))
-        }
+        
     }
-    console.log(++wave)
-    console.log(objCount)
+    //console.log(++wave)
+    //console.log(objCount)
 }
 function mainLoop()
 {
@@ -150,7 +142,7 @@ function mainLoop()
             dist /= 200
             DashImpact(player.collider.pos)
             player.collider.pos.AddSelf(new Vec2(player.velocity.x / dist, player.velocity.y / dist)) 
-            Delay(1500).then(() => {player.special = 1;})
+            Delay(500).then(() => {player.special = 1;})
         }
     }
     //If the player is outside the boundary
